@@ -7,9 +7,10 @@ pipeline {
         SOURCE_CODE_REPO = 'https://github.com/Fwdkhan10/TerminalTocs.git'
         IMAGE_NAME = 'bmi-calculator'
         DOCKER_USERNAME = 'fwdkhan10'
-        DOCKER_REPO_NAME = 'terminaltocs'
+        DOCKER_REPO_NAME = 'tocs'
         DOCKER_PWD = 'fawadahmad110801%40' // URL encoded password
         NOTIFICATION_LIST = 'fwdk91@gmail.com' // Your email recipients
+        BACKUP_IMAGE_TAG = 'backup'
     }
 
     stages {
@@ -17,6 +18,19 @@ pipeline {
             steps {
                 script {
                     checkout([$class: 'GitSCM', branches: [[name: 'main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: SOURCE_CODE_REPO]]])
+                }
+            }
+        }
+
+        stage('Prepare Rollback Image') {
+            steps {
+                script {
+                    // Check if there is a previous build and a corresponding image
+                    if (currentBuild.previousBuild) {
+                        // Tag the previous successful image as a backup
+                        bat "docker tag %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:latest %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:%BACKUP_IMAGE_TAG%"
+                        bat "docker push %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:%BACKUP_IMAGE_TAG%"
+                    }
                 }
             }
         }
@@ -50,8 +64,14 @@ pipeline {
                     to: NOTIFICATION_LIST
         }
         failure {
-            emailext body: 'Build failed. Review details here: ${BUILD_URL}',
-                    subject: 'Failure: Build #${BUILD_NUMBER}',
+            script {
+                // Roll back to the backup image on failure
+                bat "docker tag %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:%BACKUP_IMAGE_TAG% %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:latest"
+                bat "docker push %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:latest"
+                // Here, you might need additional steps to redeploy the backup image
+            }
+            emailext body: 'Build failed. Rollback to previous version executed.\nDetails: ${BUILD_URL}',
+                    subject: 'Failure: Build #${BUILD_NUMBER}, Rolled Back',
                     to: NOTIFICATION_LIST
         }
     }
