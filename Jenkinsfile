@@ -34,8 +34,8 @@ pipeline {
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dckr_pat_rOiA9akaPdaPa4uwz6fFQ060AcM', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PWD']]) {
                         bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PWD%'
-                        bat 'docker tag %IMAGE_NAME% %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:latest'
-                        bat 'docker push %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:latest'
+                        bat 'docker tag %IMAGE_NAME% %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:%BUILD_NUMBER%'
+                        bat 'docker push %DOCKER_USERNAME%/%DOCKER_REPO_NAME%:%BUILD_NUMBER%'
                     }
                 }
             }
