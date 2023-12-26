@@ -5,7 +5,7 @@ pipeline {
         // Redefined environment variables
         DOCKER_CREDENTIALS_ID = credentials('dckr_pat_rOiA9akaPdaPa4uwz6fFQ060AcM')
         SOURCE_CODE_REPO = 'https://github.com/Fwdkhan10/TerminalTocs.git'
-        IMAGE_NAME = 'bmi-calculator'
+        IMAGE_NAME = 'bmicalculator'
         DOCKER_USERNAME = 'fwdkhan10'
         DOCKER_REPO_NAME = 'tocsterminal'
         DOCKER_PWD = 'fawadahmad110801%40' // URL encoded password
