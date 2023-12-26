@@ -7,7 +7,7 @@ pipeline {
         SOURCE_CODE_REPO = 'https://github.com/Fwdkhan10/TerminalTocs.git'
         IMAGE_NAME = 'bmi-calculator'
         DOCKER_USERNAME = 'fwdkhan10'
-        DOCKER_REPO_NAME = 'terminaltocs'
+        DOCKER_REPO_NAME = 'tocs'
         DOCKER_PWD = 'fawadahmad110801%40' // URL encoded password
         NOTIFICATION_LIST = 'fwdk91@gmail.com' // Your email recipients
     }
