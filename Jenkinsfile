@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USERNAME = 'habib926653'
-        DOCKER_REPOSITORY = 'tocsfwd'
+        DOCKER_USERNAME = 'fwdkhan10'
+        DOCKER_REPOSITORY = 'tocsterminal'
         DOCKER_IMAGE_NAME = 'bmi_calculator'
-        DOCKER_PASSWORD = 'habib-habib' // Use the correct credential ID for Docker Hub
+        DOCKER_PASSWORD = 'fawadahmad' // Use the correct credential ID for Docker Hub
         CONTAINER_NAME = 'my_container'
     }
 
