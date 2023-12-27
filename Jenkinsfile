@@ -6,14 +6,14 @@ pipeline {
         DOCKER_USERNAME = 'fwdkhan10'
         DOCKER_REPOSITORY = 'tocsterminal'
         DOCKER_IMAGE_NAME = 'bmi_calculator'
-        DOCKER_PASSWORD = 'fawadahmad' // Use the correct credential ID for Docker Hub
+        DOCKER_PASSWORD = 'fawadahmad'
         CONTAINER_NAME = 'my_container'
     }
 
     stages {
-        stage('Clone from GitHub') {
+        stage('Clone Source Code') {
             steps {
-                // Clone the repository
+                // Clone the main branch of the repository
                 git branch: 'main', url: 'https://github.com/Fwdkhan10/TerminalTocs.git'
             }
         }
@@ -21,8 +21,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    sh "docker build -t ${DOCKER_IMAGE_NAME} ."
+                    // Building the Docker image from Dockerfile
+                    sh "docker build -t ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME} ."
                 }
             }
         }
@@ -30,40 +30,28 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    // Login to Docker Hub
-                    sh "docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}"
+                    // Secure login to Docker Hub
+                    sh "echo ${DOCKER_PASSWORD} | docker login --username ${DOCKER_USERNAME} --password-stdin"
 
-                    // Tag the Docker image
-                    sh "docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}"
-
-                    // Push the Docker image to DockerHub
-                    sh "docker push ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}"
+                    // Tagging and pushing the Docker image to Docker Hub
+                    sh "docker tag ${DOCKER_USERNAME}/${DOCKER_IMAGE_NAME} ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}:${BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}:${BUILD_NUMBER}"
                 }
             }
         }
 
-        stage('Stop and Remove Existing Container') {
-            steps {
-script {
-    // Stop and remove existing container if it exists
-    if (sh(script: "docker inspect $CONTAINER_NAME > /dev/null 2>&1", returnStatus: true) == 0) {
-        sh "docker stop $CONTAINER_NAME"
-        sh "docker rm -f $CONTAINER_NAME"
-    }
-}
-                    }
-            }
-
-        stage('Pull and Run Docker Container') {
+        stage('Update Docker Container') {
             steps {
                 script {
-                    // deleting existing image if already exists
-                    // sh "docker inspect ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}:latest > /dev/null 2>&1 && docker rmi -f ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}:latest || true"
-                    // Pull the Docker image
-                    sh "docker pull ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}"
+                    // Check if the container exists and stop/remove it
+                    if (sh(script: "docker container inspect $CONTAINER_NAME > /dev/null 2>&1", returnStatus: true) == 0) {
+                        sh "docker stop $CONTAINER_NAME"
+                        sh "docker rm $CONTAINER_NAME"
+                    }
 
-                    // Run the Docker container
-                    sh "docker run -d --name ${CONTAINER_NAME} -p 80:80 ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}"
+                    // Pull the latest Docker image and run the container
+                    sh "docker pull ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}:${BUILD_NUMBER}"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 80:80 ${DOCKER_USERNAME}/${DOCKER_REPOSITORY}:${BUILD_NUMBER}"
                 }
             }
         }
