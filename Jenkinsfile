@@ -10,14 +10,14 @@ pipeline {
     }
 
     stages {
-        stage('Clone from GitHub') {
+        stage('Clone Source Code') {
             steps {
                 // Clone the repository
                 git branch: 'main', url: 'https://github.com/Fwdkhan10/TerminalTocs.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Image') {
             steps {
                 script {
                     // Build the Docker image
@@ -26,7 +26,7 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Image to DockerHub') {
             steps {
                 script {
                     // Login to Docker Hub
@@ -41,7 +41,7 @@ pipeline {
             }
         }
 
-        stage('Stop and Remove Existing Container') {
+        stage('Remove Existing Docker Container') {
             steps {
 script {
     // Stop and remove existing container if it exists
@@ -53,7 +53,7 @@ script {
                     }
             }
 
-        stage('Pull and Run Docker Container') {
+        stage('Run Docker Container') {
             steps {
                 script {
                     // deleting existing image if already exists
