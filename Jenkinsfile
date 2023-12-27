@@ -5,7 +5,6 @@ pipeline {
         DOCKER_USERNAME = 'fwdkhan10'
         DOCKER_REPOSITORY = 'tocsterminal'
         DOCKER_IMAGE_NAME = 'bmi_calculator'
-        // Recommended to use credentials binding plugin for Docker password
         DOCKER_PASSWORD = 'fawadahmad'
         CONTAINER_NAME = 'my_container'
     }
